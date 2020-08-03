@@ -1,0 +1,19 @@
+<html>
+    <head>
+        <title>Drive Test</title>    
+    </head>
+    <script type=text/javascript src="{{ url_for('static', filename='js/jquery-3.5.1.min.js') }}"></script>
+    <body>
+        <h1>Hi, User</h1>
+        <input type="button" id="forward" value="Вперёд">
+        <input type="button" id="back"    value="Назад">
+        <input type="button" id="right"   value="Направо">
+        <input type="button" id="left"    value="Налево">
+        <input type="button" id="on_line" value="По линии">
+        <input type="button" id="stop"    value="Стоп">
+        <input type="range"  id="speed"  min="0"    max="6"   value="0" >
+        <input type="range"  id="dir"    min="-255" max="255" value="0" step="1" >
+        <button onclick="in_zero()">В ноль</button>
+    </body>
+    <script src="{{url_for('static', filename='script.js')}}"></script>
+</html>
