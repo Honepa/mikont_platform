@@ -106,6 +106,26 @@ void setupSerial()
   Serial.begin(9600);
 }
 
+int chenge_pwm(char num_pwm, int in_pwm)
+{
+  if(num_pwm == '0')
+  {
+    lft_pwm = 255;
+    rgt_pwm = 255;
+  }
+  else if (num_pwm == '1')
+  {
+    lft_pwm = lft_pwm - in_pwm;
+    rgt_pwm = 255;
+  }
+  else if (num_pwm == '2')
+  {
+    lft_pwm = 255;
+    rgt_pwm = rgt_pwm - in_pwm;
+  }
+  return 1;
+}
+
 void setup()
 {
   setupPins();
@@ -113,7 +133,8 @@ void setup()
   setupSerial();
   setupInterrupts();
 }
-
+char choise_pwm = ' ';
+int pwm = 0;
 void loop()
 {
   char c = ' ';
@@ -124,11 +145,42 @@ void loop()
     {
       case 'f':
         platform_state = FORWARD;
+        choise_pwm = Serial.read();
+        pwm = Serial.read();
+        chenge_pwm(choise_pwm, pwm);
         Serial.println("FORWARD");
+        break;
+      case 'b':
+        platform_state = BACK;
+        choise_pwm = Serial.read();
+        pwm = Serial.read();
+        chenge_pwm(choise_pwm, pwm);
+        Serial.println("BACK");
         break;
       case 's':
         platform_state = STOP;
         Serial.println("STOP");
+        break;
+      case 'c':
+        Serial.println(1);
+        break;
+      case 'l':
+        platform_state = ROT_LFT;
+        choise_pwm = Serial.read();
+        pwm = Serial.read();
+        chenge_pwm(choise_pwm, pwm);
+        Serial.println("LEFT");
+        break;
+      case 'r':
+        platform_state = ROT_RGT;
+        choise_pwm = Serial.read();
+        pwm = Serial.read();
+        chenge_pwm(choise_pwm, pwm);
+        Serial.println("RIGHT");
+        break;
+      case 't':
+        platform_state = FOLLOW_LINE;
+        Serial.println("ON_LINE");
         break;
     }
   } else {
