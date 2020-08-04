@@ -7,22 +7,23 @@ var state = {
     stop    : 0,
     speed   : 0,
     dir     : 0,
-    };
+};
     
-let timer_id = setInterval(fl_drive, 500);
+let timer_id = setInterval(fl_drive, 5000);
 function fl_drive(){
     console.log(state),
     $.ajax({
-            url: '/state',
-            type: "POST",
-            data: state,
-            success: function(response) {
-                console.log(response);
-            },
-            error: function(error) {
-                    console.log(error);
-                }
-});
+        url: '/state',
+        type: "POST",
+        data: state,
+        success: function(responce) {
+            $('pre').text(responce);
+            //console.log($('log'));
+        },
+        error: function(error) {
+            console.log(error);
+        }
+    });
 };    
 $(window).on('mouseup', function(){
     state.forward = 0;

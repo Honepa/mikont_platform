@@ -77,10 +77,10 @@ void setupPins()
 
 void setupTimers()
 {
-  Timer4.attachInterrupt(onCountTimer);
-  Timer4.start(1000000);
-  Timer2.attachInterrupt(onLogTimer);
-  Timer2.start(1000000);
+//  Timer4.attachInterrupt(onCountTimer);
+//  Timer4.start(1000000);
+//  Timer2.attachInterrupt(onLogTimer);
+//  Timer2.start(1000000);
   Timer3.attachInterrupt(onPWMTimer);
   Timer3.start(50); 
 }
@@ -98,6 +98,7 @@ void setupInterrupts()
 void setupSerial()
 {
   Serial.begin(9600);
+  Serial.setTimeout(100);
 }
 
 void setup()
@@ -110,34 +111,25 @@ void setup()
 
 void loop()
 {
-  char c = ' ';
+  int cmd = 0;
   if (Serial.available())
   {
-    c = Serial.read();
-    lft_pwm = Serial.read();
-    rgt_pwm = Serial.read();
-    switch (c)
+    cmd = Serial.parseInt();
+    if (cmd == 1001)
     {
-      case 'f':
-        platform_state = FORWARD;
-        Serial.println("FORWARD");
-        break;
-      case 's':
-        platform_state = STOP;
-        Serial.println("STOP");
-        break;
-      case 'c':
-        Serial.println(1);
-        break;
-      case 't':
-        platform_state = FOLLOW_LINE;
-        Serial.println("FOLLOW_LINE");
-        break;
+      Serial.println("ready");
+    }
+    else
+    {
+      if (cmd)
+      {
+        lft_pwm = Serial.parseInt();
+        rgt_pwm = Serial.parseInt();
+      }
+      Serial.println(cmd);
+      Serial.println(lft_pwm);
+      Serial.println(rgt_pwm);
     }
   } else {
-    switch (platform_state)
-        break;
- }
-
-
+  }
 }
