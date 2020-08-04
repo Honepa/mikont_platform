@@ -23,12 +23,12 @@ class Arduino():
                 #print(port)
                 self.port = Serial(port = port, baudrate = 9600, timeout = 2)
                 #print(self.port.readlines())
-                self.port.write('c')
+                self.port.write(b'c')
                 b = self.port.read()
                 
                 
                 if b == x:
-                    break               
+                    break
                
                 
             except SerialException as e:
@@ -48,17 +48,17 @@ class Arduino():
 
 arduino_due = Arduino(0)
 
-def chenge_dir(direct):
+def change_dir(direct):
     if direct == 0:
-        arduino_due.port.write('0')
-        arduino_due.port.write(chr(direct))
+        arduino_due.port.write(b'0')
+        arduino_due.port.write(direct.to_bytes(1, 'big'))
     elif direct > 0:
-        arduino_due.port.write('1')
-        arduino_due.port.write(chr(direct))
+        arduino_due.port.write(b'1')
+        arduino_due.port.write(direct.to_bytes(1, 'big'))
     elif direct < 0:
-        direct = direct * -1
-        arduino_due.port.write('2')
-        arduino_due.port.write(chr(direct))
+        direct *= -1
+        arduino_due.port.write(b'2')
+        arduino_due.port.write(direct.to_bytes(1, 'big'))
     return 1
 
 app = Flask(__name__)
@@ -70,38 +70,37 @@ def index(**qwargs):
 @app.route('/state', methods=['GET','POST'])
 def drive_mod(**qwargs):
     state = request.form
-    speed = state.get('speed')
-    direct = state.get('dir')
+    speed = int(state.get('speed'))
+    direct = int(state.get('dir'))
     print(state.get('speed'))
     print(state.get('dir'))
     if state.get('forward') == "1":
-        arduino_due.port.write('f')
-        chenge_dir(direct)
-        arduino_due.port.write(chr(speed))
+        arduino_due.port.write(b'f')
+        change_dir(direct)
+        arduino_due.port.write(speed.to_bytes(1, 'big'))
         print("go forward", speed, direct)
     elif state.get('back') == "1":
-        arduino_due.port.write('b')
-        chenge_dir(direct)
-        arduino_due.port.write(chr(speed))
+        arduino_due.port.write(b'b')
+        change_dir(direct)
+        arduino_due.port.write(speed.to_bytes(1, 'big'))
         print("go back", speed, direct)
     elif state.get('left') == "1":
-        arduino_due.port.write('l')
-        chenge_dir(direct)
-        arduino_due.port.write(chr(speed))
+        arduino_due.port.write(b'l')
+        change_dir(direct)
+        arduino_due.port.write(speed.to_bytes(1, 'big'))
         print("go left", speed, direct)
     elif state.get('right') == "1":
-        arduino_due.port.write('r')
-        chenge_dir(direct)
-        arduino_due.port.write(chr(speed))
+        arduino_due.port.write(b'r')
+        change_dir(direct)
+        arduino_due.port.write(speed.to_bytes(1, 'big'))
         print("go right", speed, direct)
     elif state.get('on_line') == "1":
-        arduino_due.port.write('t')
-
-        arduino_due.port.write(chr(speed))
+        arduino_due.port.write(b't')
+        arduino_due.port.write(speed.to_bytes(1, 'big'))
         print("go of line", speed,  direct)
     elif state.get('stop') == "1":
-        arduino_due.port.write('s')
-        arduino_due.port.write(chr(speed))
+        arduino_due.port.write(b's')
+        arduino_due.port.write(speed.to_bytes(1, 'big'))
         print("stop!!!", speed, direct)
     else:
         print("wait")

@@ -30,12 +30,6 @@ void onPWMTimer()
   dw(13, ! dr(13));
   pwm_timer_cnt++;
 
-  lft_pwm += (lft_target - lft_avg) / 10;
-  rgt_pwm += (rgt_target - rgt_avg) / 10;
-
-  lft_pwm = 0;
-  rgt_pwm = 0;
-
   dw(4, pwm_timer_cnt < lft_pwm);
   dw(2, pwm_timer_cnt < rgt_pwm);
 }
@@ -106,26 +100,6 @@ void setupSerial()
   Serial.begin(9600);
 }
 
-int chenge_pwm(char num_pwm, int in_pwm)
-{
-  if(num_pwm == '0')
-  {
-    lft_pwm = 255;
-    rgt_pwm = 255;
-  }
-  else if (num_pwm == '1')
-  {
-    lft_pwm = lft_pwm - in_pwm;
-    rgt_pwm = 255;
-  }
-  else if (num_pwm == '2')
-  {
-    lft_pwm = 255;
-    rgt_pwm = rgt_pwm - in_pwm;
-  }
-  return 1;
-}
-
 void setup()
 {
   setupPins();
@@ -133,29 +107,20 @@ void setup()
   setupSerial();
   setupInterrupts();
 }
-char choise_pwm = ' ';
-int pwm = 0;
+
 void loop()
 {
   char c = ' ';
   if (Serial.available())
   {
     c = Serial.read();
+    lft_pwm = Serial.read();
+    rgt_pwm = Serial.read();
     switch (c)
     {
       case 'f':
         platform_state = FORWARD;
-        choise_pwm = Serial.read();
-        pwm = Serial.read();
-        chenge_pwm(choise_pwm, pwm);
         Serial.println("FORWARD");
-        break;
-      case 'b':
-        platform_state = BACK;
-        choise_pwm = Serial.read();
-        pwm = Serial.read();
-        chenge_pwm(choise_pwm, pwm);
-        Serial.println("BACK");
         break;
       case 's':
         platform_state = STOP;
@@ -164,49 +129,15 @@ void loop()
       case 'c':
         Serial.println(1);
         break;
-      case 'l':
-        platform_state = ROT_LFT;
-        choise_pwm = Serial.read();
-        pwm = Serial.read();
-        chenge_pwm(choise_pwm, pwm);
-        Serial.println("LEFT");
-        break;
-      case 'r':
-        platform_state = ROT_RGT;
-        choise_pwm = Serial.read();
-        pwm = Serial.read();
-        chenge_pwm(choise_pwm, pwm);
-        Serial.println("RIGHT");
-        break;
       case 't':
         platform_state = FOLLOW_LINE;
-        Serial.println("ON_LINE");
+        Serial.println("FOLLOW_LINE");
         break;
     }
   } else {
     switch (platform_state)
-    {
-      case INIT:
-        platformStop();
-        platform_state = READY;
         break;
-      case READY:
-        break;
-      case FORWARD:
-        platformForward();
-        platform_state = READY;
-        break;
-      case STOP:
-        platformStop();
-        platform_state = READY;
-        break;
-      case ROT_LFT:
-        break;
-      case ROT_RGT:
-        break;
-      case FOLLOW_LINE:
-        break;
+ }
 
-    }
-  }
+
 }
