@@ -1,6 +1,16 @@
 #include "DueTimer.h"
 #include "typedef.h"
 
+float get_voltage()
+{
+  return ar(A3) / 70.9;
+}
+
+float get_current()
+{
+  return (ar(A4) - 503) / 25;
+}
+
 void platformStop()
 {
   lft_target = 0;
@@ -77,10 +87,10 @@ void setupPins()
 
 void setupTimers()
 {
-  Timer4.attachInterrupt(onCountTimer);
-  Timer4.start(1000000);
-  Timer2.attachInterrupt(onLogTimer);
-  Timer2.start(1000000);
+//  Timer4.attachInterrupt(onCountTimer);
+//  Timer4.start(1000000);
+//  Timer2.attachInterrupt(onLogTimer);
+//  Timer2.start(1000000);
   Timer3.attachInterrupt(onPWMTimer);
   Timer3.start(50); 
 }
@@ -98,6 +108,7 @@ void setupInterrupts()
 void setupSerial()
 {
   Serial.begin(9600);
+  Serial.setTimeout(100);
 }
 
 void setup()
@@ -110,34 +121,52 @@ void setup()
 
 void loop()
 {
-  char c = ' ';
   if (Serial.available())
   {
-    c = Serial.read();
-    lft_pwm = Serial.read();
-    rgt_pwm = Serial.read();
-    switch (c)
+    cmd = Serial.parseInt();
+    if (cmd == CMD_TEST) 
     {
-      case 'f':
-        platform_state = FORWARD;
-        Serial.println("FORWARD");
-        break;
-      case 's':
-        platform_state = STOP;
-        Serial.println("STOP");
-        break;
-      case 'c':
-        Serial.println(1);
-        break;
-      case 't':
-        platform_state = FOLLOW_LINE;
-        Serial.println("FOLLOW_LINE");
-        break;
+      Serial.parseInt();
+      Serial.parseInt();
     }
+    else if (cmd == CMD_FORWARD) 
+    {
+      lft_pwm = Serial.parseInt();
+      rgt_pwm = Serial.parseInt();
+    }
+    else if (cmd == CMD_BACK) 
+    {
+      lft_pwm = 0; Serial.parseInt();
+      rgt_pwm = 0; Serial.parseInt();
+    }
+    else if (cmd == CMD_LEFT) 
+    {
+      lft_pwm = Serial.parseInt();
+      rgt_pwm = Serial.parseInt();
+    }
+    else if (cmd == CMD_RIGHT) 
+    {
+      lft_pwm = Serial.parseInt();
+      rgt_pwm = Serial.parseInt();
+    }
+    else if (cmd == CMD_ON_LINE) 
+    {
+      lft_pwm = Serial.parseInt();
+      rgt_pwm = Serial.parseInt();
+    }
+    else if (cmd == CMD_STOP) 
+    {
+      lft_pwm = 0; Serial.parseInt();
+      rgt_pwm = 0; Serial.parseInt();
+    }
+    Serial.println(cmd);
+    Serial.println(lft_pwm);
+    Serial.println(rgt_pwm);
+    Serial.println(ar(A0));
+    Serial.println(ar(A1));
+    Serial.println(ar(A2));  
+    Serial.println(get_voltage());  
+    Serial.println(get_current());  
   } else {
-    switch (platform_state)
-        break;
- }
-
-
+  }
 }
