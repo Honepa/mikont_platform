@@ -1,6 +1,16 @@
 #include "DueTimer.h"
 #include "typedef.h"
 
+float get_voltage()
+{
+  return ar(A3) / 70.9;
+}
+
+float get_current()
+{
+  return (ar(A4) - 503) / 25;
+}
+
 void platformStop()
 {
   lft_target = 0;
@@ -111,25 +121,52 @@ void setup()
 
 void loop()
 {
-  int cmd = 0;
   if (Serial.available())
   {
     cmd = Serial.parseInt();
-    if (cmd == 1001)
+    if (cmd == CMD_TEST) 
     {
-      Serial.println("ready");
+      Serial.parseInt();
+      Serial.parseInt();
     }
-    else
+    else if (cmd == CMD_FORWARD) 
     {
-      if (cmd)
-      {
-        lft_pwm = Serial.parseInt();
-        rgt_pwm = Serial.parseInt();
-      }
-      Serial.println(cmd);
-      Serial.println(lft_pwm);
-      Serial.println(rgt_pwm);
+      lft_pwm = Serial.parseInt();
+      rgt_pwm = Serial.parseInt();
     }
+    else if (cmd == CMD_BACK) 
+    {
+      lft_pwm = 0; Serial.parseInt();
+      rgt_pwm = 0; Serial.parseInt();
+    }
+    else if (cmd == CMD_LEFT) 
+    {
+      lft_pwm = Serial.parseInt();
+      rgt_pwm = Serial.parseInt();
+    }
+    else if (cmd == CMD_RIGHT) 
+    {
+      lft_pwm = Serial.parseInt();
+      rgt_pwm = Serial.parseInt();
+    }
+    else if (cmd == CMD_ON_LINE) 
+    {
+      lft_pwm = Serial.parseInt();
+      rgt_pwm = Serial.parseInt();
+    }
+    else if (cmd == CMD_STOP) 
+    {
+      lft_pwm = 0; Serial.parseInt();
+      rgt_pwm = 0; Serial.parseInt();
+    }
+    Serial.println(cmd);
+    Serial.println(lft_pwm);
+    Serial.println(rgt_pwm);
+    Serial.println(ar(A0));
+    Serial.println(ar(A1));
+    Serial.println(ar(A2));  
+    Serial.println(get_voltage());  
+    Serial.println(get_current());  
   } else {
   }
 }

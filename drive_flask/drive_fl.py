@@ -2,49 +2,9 @@
 #flask run --host 0.0.0.0 --port 8080
 
 import sys
-import sys
 
 from flask import Flask, render_template, request
-from serial import Serial, SerialException
 from json import dumps
-from time import sleep 
-
-PORTS = ['/dev/ttyUSB0', '/dev/ttyUSB1', '/dev/ttyUSB2', '/dev/ttyUSB3', '/dev/ttyUSB4', '/dev/ttyACM0', '/dev/ttyACM1', '/dev/ttyACM2']
-
-class Arduino():
-    
-    def __init__(self, x):
-        self.port = None
-        for port in PORTS:
-            try:
-                #print(port)
-                self.port = Serial(port = port, baudrate = 9600, timeout = 1)
-                #print(self.port.readlines())
-                self.port.write(bytes("1001", "ascii"))
-                sleep(1)
-                print(self.port.readlines())
-                break
-               
-            except SerialException as e:
-                print(port, 'failed')
-            
-        if self.port == None:
-            raise SerialException('Port is not found')
-    
-    def __del__(self):
-        try:
-            self.port.close()
-        except AttributeError:
-            print('nicht close', file = sys.stderr)        
-
-    def __str__(self):
-        return str(self.port)
-
-    
-    def read_responce_dict(self):
-        x = self.port.readlines()
-        print(x)
-        return {'a':'b'}
 
 arduino_due = Arduino(0)
 

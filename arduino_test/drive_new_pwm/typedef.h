@@ -7,19 +7,22 @@
 #define ar analogRead
 #define aw analogWrite
 
+#define CMD_TEST 1001
+#define CMD_FORWARD 1
+#define CMD_BACK 2
+#define CMD_LEFT 3
+#define CMD_RIGHT 4
+#define CMD_ON_LINE 5
+#define CMD_STOP 0
+#define CMD_NONE -1
+
 enum ENPlatformState
 {
     INIT, READY, FORWARD, STOP, ROT_LFT, ROT_RGT, FOLLOW_LINE, BACK
 };
 
-enum ENCommand
-{
-    CMD_NONE, CMD_FORWARD, CMD_STOP, CMD_ROT_LFT, CMD_ROT_RGT, CMD_FOLLOW_LINE
-};
-
-
 ENPlatformState platform_state = INIT;
-ENCommand cmd = CMD_NONE;
+int cmd = CMD_NONE;
 
 volatile uint8_t pwm_timer_cnt = 0;
 
