@@ -84,4 +84,6 @@ class Arduino():
 if __name__ == '__main__':
     from pprint import pprint
     ino = Arduino()
-    pprint(ino.test())
+    while 1:
+        pprint(ino.test())
+        sleep(1)
