@@ -1,7 +1,9 @@
 *.ino.bin
 *ino.elf
 *.ino.map
+
 build/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
