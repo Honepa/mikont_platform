@@ -4,13 +4,13 @@
 void motors(int on_off)
 {
   motors_state = on_off;
-  dw( 9, motors_state);
+  dw(10, motors_state);
 }
 
 void sensor(int on_off)
 {
   sensor_state = on_off;
-  dw(10, sensor_state); 
+  dw( 9, sensor_state); 
 }
 
 float get_voltage()
@@ -20,7 +20,7 @@ float get_voltage()
 
 float get_current()
 {
-  //return ar(A4);
+  return ar(A4);
   return ((float) ar(A4) - 503.0) / -25.0;
 }
 
