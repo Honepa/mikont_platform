@@ -16,6 +16,9 @@
 #define CMD_STOP 0
 #define CMD_NONE -1
 
+#define ON  0
+#define OFF 1
+
 enum ENPlatformState
 {
     INIT, READY, FORWARD, STOP, ROT_LFT, ROT_RGT, FOLLOW_LINE, BACK
@@ -36,5 +39,7 @@ volatile int lft_avg = 0;
 volatile int rgt_avg = 0;
 int lft_target = 0;
 int rgt_target = 0;
+int motors_state = OFF;
+int sensor_state = OFF;
 
 #endif

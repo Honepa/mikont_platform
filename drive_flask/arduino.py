@@ -18,11 +18,15 @@ class Arduino():
         (str, "last_cmd"), 
         (int, "lft_pwm"), 
         (int, "rgt_pwm"), 
+        (int, "lft_avg"), 
+        (int, "rgt_avg"), 
         (float, "a0"), 
         (float, "a1"), 
         (float, "a2"), 
         (float, "VCC"), 
         (float, "I"), 
+        (int, "motors_state"), 
+        (int, "sensor_state"), 
     ]
     TEST = 1001
     FORWARD = 1
@@ -61,16 +65,43 @@ class Arduino():
             "lft_pwm": 0,
             "rgt_pwm": 0,
         }
-        self.send_command_dict(command)
-        return self.read_responce_dict()
+        self.__send_command_dict(command)
+        return self.__read_responce_dict()
 
-    def send_command_dict(self, command):
+    def forward(self, lft_pwm, rgt_pwm):
+        command = {
+            "cmd": self.FORWARD,
+            "lft_pwm": lft_pwm,
+            "rgt_pwm": rgt_pwm,
+        }
+        self.__send_command_dict(command)
+        return self.__read_responce_dict()
+
+    def follow_line(self, lft_pwm, rgt_pwm):
+        command = {
+            "cmd": self.ON_LINE,
+            "lft_pwm": lft_pwm,
+            "rgt_pwm": rgt_pwm,
+        }
+        self.__send_command_dict(command)
+        return self.__read_responce_dict()
+
+    def stop(self):
+        command = {
+            "cmd": self.STOP,
+            "lft_pwm": 0,
+            "rgt_pwm": 0,
+        }
+        self.__send_command_dict(command)
+        return self.__read_responce_dict()
+
+    def __send_command_dict(self, command):
         to_send = ""
         for key in self.COMMAND_KEY_ORDER:
             to_send += "%s " % str(command[key])
         self.port.write(bytes(to_send.strip(), "ascii"))
 
-    def read_responce_dict(self):
+    def __read_responce_dict(self):
         rez = {}
         try:
             for _type, key in self.RESPONCE_KEY_ORDER:
@@ -84,6 +115,16 @@ class Arduino():
 if __name__ == '__main__':
     from pprint import pprint
     ino = Arduino()
-    while 1:
+    pprint(ino.test())
+    sleep(1)
+    pprint(ino.forward(20,20))
+    for i in range(10):
         pprint(ino.test())
         sleep(1)
+    pprint(ino.follow_line(50,50))
+    for i in range(10):
+        pprint(ino.test())
+        sleep(1)
+    pprint(ino.stop())
+    pprint(ino.test())
+        
