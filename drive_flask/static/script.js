@@ -101,15 +101,15 @@ document.getElementById("stop").addEventListener("mousedown", function(){
     state.stop    = 1;
 });
 
-$("#speed").on("click", function() {
-    state.speed=this.value;
-});
 
+function change_speed(new_speed) {
+    state.speed = new_speed;
+};
 function change_dir(new_dir){
     state.dir = new_dir;
-}
+};
 
 function in_zero() {
-    $("#dir").value = 0;
+    document.getElementById("dir").value = 0;
     state.dir     = 0;
 };

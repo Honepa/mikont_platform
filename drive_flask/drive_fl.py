@@ -4,7 +4,7 @@
 from flask import Flask, render_template, request
 from json import dumps
 from arduino import Arduino
-arduino_due = Arduino()
+#arduino_due = Arduino()
 
 def change_dir(speed, direct):
     x = int(direct * (speed / 255))
