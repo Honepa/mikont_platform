@@ -24,7 +24,13 @@ enum ENPlatformState
     INIT, READY, FORWARD, STOP, ROT_LFT, ROT_RGT, FOLLOW_LINE, BACK
 };
 
+enum ENFollowState
+{
+    CALIBRATE, CENTER, LEFT, RIGHT, FAIL
+};
+
 ENPlatformState platform_state = INIT;
+ENFollowState follow_state = CALIBRATE;
 int cmd = CMD_NONE;
 
 volatile uint8_t pwm_timer_cnt = 0;
@@ -43,6 +49,9 @@ volatile int I_a = 0;
 volatile int V_a = 0;
 volatile int I_c = 0;
 volatile int V_c = 0;
+volatile int S_cnt = 0;
+volatile int S_rgt = 0;
+volatile int S_lft = 0;
 int lft_target = 0;
 int rgt_target = 0;
 int motors_state = OFF;

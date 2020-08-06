@@ -28,6 +28,14 @@ void platformForward(int lft, int rgt)
   rgt_target = rgt;
 }
 
+void platformFollow(int lft, int rgt)
+{
+  switch (follow_state)
+  {
+
+  }
+}
+
 float get_voltage()
 {
   return V_a / 70.9;
@@ -36,6 +44,21 @@ float get_voltage()
 float get_current()
 {
   return -I_a / 25.0 + 20.0;
+}
+
+int get_cnt_sens()
+{
+  return S_cnt < S_cnt_lvl;
+}
+
+int get_rgt_sens()
+{
+  return S_rgt < S_rgt_lvl;
+}
+
+int get_lft_sens()
+{
+  return S_lft < S_lft_lvl;
 }
 
 void onCountTimer()
@@ -49,8 +72,10 @@ void onCountTimer()
   lft_ticks = 0;
   rgt_ticks = 0;
 
-  lft_pwm += round(0.3 * (lft_target - lft_avg));
-  rgt_pwm += round(0.3 * (rgt_target - rgt_avg));
+  // lft_pwm += round(0.3 * (lft_target - lft_avg));
+  // rgt_pwm += round(0.3 * (rgt_target - rgt_avg));
+  lft_pwm = lft_target;
+  rgt_pwm = rgt_target;
   lft_pwm = min(255, max(0, lft_pwm));
   rgt_pwm = min(255, max(0, rgt_pwm));
 }
@@ -66,6 +91,9 @@ void onPWMTimer()
 
 void onMeasureTimer()
 {
+  S_cnt = ar(A0);
+  S_rgt = ar(A1);
+  S_lft = ar(A2);
   I_m = ar(A4);
   V_m = ar(A3);
   I_c += I_m - I_a;
@@ -221,9 +249,9 @@ void loop()
     Serial.println(rgt_avg);
     Serial.println(lft_pwm);
     Serial.println(rgt_pwm);
-    Serial.println(ar(A0));
-    Serial.println(ar(A1));
-    Serial.println(ar(A2));  
+    Serial.println(get_cnt_sens());
+    Serial.println(get_rgt_sens());
+    Serial.println(get_lft_sens());
     Serial.println(get_voltage());  
     Serial.println(get_current());  
     Serial.println(motors_state);  
@@ -255,8 +283,7 @@ void loop()
         sensor(OFF);
         break;
       case FOLLOW_LINE:
-        motors(ON);
-        sensor(ON);
+        platformFollow(lft_target, rgt_target);
 
         break;
       case BACK:

@@ -50,9 +50,9 @@ class Arduino():
         (int, "rgt_avg", 0), 
         (int, "lft_pwm", 0), 
         (int, "rgt_pwm", 0), 
-        (float, "a0", 0), 
-        (float, "a1", 0), 
-        (float, "a2", 0), 
+        (float, "s_center", 0), 
+        (float, "s_right", 0), 
+        (float, "s_left", 0), 
         (float, "VCC", 0), 
         (float, "I", 0), 
         (int, "motors_state", "state"),
@@ -149,24 +149,11 @@ if __name__ == '__main__':
     log = []
     from pprint import pprint
     ino = Arduino()
-    for i in range(10):
-        log += [ino.test()]
-        pprint(log[-1])
-        sleep(1)
-    pprint(ino.forward(20,20))
-    for i in range(30):
-        log += [ino.test()]
-        pprint(log[-1])
-        sleep(1)
-    pprint(ino.follow_line(50,50))
-    for i in range(30):
+    pprint(ino.follow_line(0,0))
+    for i in range(20):
         log += [ino.test()]
         pprint(log[-1])
         sleep(1)
     pprint(ino.stop())
-    for i in range(10):
-        log += [ino.test()]
-        pprint(log[-1])
-        sleep(1)
     from json import dump
     dump(log, open('log.json','w'), indent = 2)
