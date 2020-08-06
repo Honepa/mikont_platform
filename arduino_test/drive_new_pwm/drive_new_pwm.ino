@@ -30,9 +30,97 @@ void platformForward(int lft, int rgt)
 
 void platformFollow(int lft, int rgt)
 {
+  static long t_0 = millis();
+  static int i_calibrate = 0;
   switch (follow_state)
   {
-
+    case START:
+      motors(OFF);
+      sensor(ON);
+      if (millis() - t_0 > 100) 
+      {
+        follow_state = CALIBRATE;
+        t_0 = millis();
+      }
+      break;
+    case CALIBRATE:
+      if (millis() - t_0 > 1000) 
+      {
+        follow_state = CALIBRATED;
+        t_0 = millis();
+        S_cnt_avg /= i_calibrate;
+        S_cnt_avg += 50;
+        S_rgt_avg /= i_calibrate;
+        S_rgt_avg += 50;
+        S_lft_avg /= i_calibrate;
+        S_lft_avg += 50;
+      } else {
+        i_calibrate++;
+        S_cnt_avg += S_cnt;
+        S_rgt_avg += S_rgt;
+        S_lft_avg += S_lft;
+      }
+      break;
+    case CALIBRATED:
+      if (millis() - t_0 > 2000) 
+      {
+        follow_state = CENTER;
+        t_0 = millis();
+      } else {
+        motors(ON);
+        lft_pwm = 40;
+        rgt_pwm = 40;
+      }
+      break;
+    case CENTER:
+      if (S_cnt < S_cnt_avg & S_lft > S_lft_avg & S_rgt > S_rgt_avg)
+      {
+        lft_pwm = lft;
+        rgt_pwm = rgt;
+      } 
+      if (S_cnt > S_cnt_avg & S_lft < S_lft_avg & S_rgt > S_rgt_avg)
+      {
+        follow_state = LEFT;
+      }
+      if (S_cnt > S_cnt_avg & S_lft > S_lft_avg & S_rgt < S_rgt_avg)
+      {
+        follow_state = RIGHT;
+      }
+      break;
+    case LEFT:
+      if (S_cnt > S_cnt_avg & S_lft < S_lft_avg & S_rgt > S_rgt_avg)
+      {
+        lft_pwm = lft / 2;
+        rgt_pwm = rgt;
+      } 
+      if (S_cnt < S_cnt_avg & S_lft > S_lft_avg & S_rgt > S_rgt_avg)
+      {
+        follow_state = CENTER;
+      }
+      if (S_cnt > S_cnt_avg & S_lft > S_lft_avg & S_rgt < S_rgt_avg)
+      {
+        follow_state = RIGHT;
+      }
+      break;
+    case RIGHT:
+      if (S_cnt > S_cnt_avg & S_lft > S_lft_avg & S_rgt < S_rgt_avg)
+      {
+        lft_pwm = lft;
+        rgt_pwm = rgt / 2;
+      } 
+      if (S_cnt < S_cnt_avg & S_lft > S_lft_avg & S_rgt > S_rgt_avg)
+      {
+        follow_state = CENTER;
+      }
+      if (S_cnt > S_cnt_avg & S_lft < S_lft_avg & S_rgt > S_rgt_avg)
+      {
+        follow_state = RIGHT;
+      }
+      break;
+    case FAIL:
+      motors(OFF);
+      sensor(OFF);
+      break;
   }
 }
 
@@ -44,21 +132,6 @@ float get_voltage()
 float get_current()
 {
   return -I_a / 25.0 + 20.0;
-}
-
-int get_cnt_sens()
-{
-  return S_cnt < S_cnt_lvl;
-}
-
-int get_rgt_sens()
-{
-  return S_rgt < S_rgt_lvl;
-}
-
-int get_lft_sens()
-{
-  return S_lft < S_lft_lvl;
 }
 
 void onCountTimer()
@@ -249,9 +322,13 @@ void loop()
     Serial.println(rgt_avg);
     Serial.println(lft_pwm);
     Serial.println(rgt_pwm);
-    Serial.println(get_cnt_sens());
-    Serial.println(get_rgt_sens());
-    Serial.println(get_lft_sens());
+    Serial.println(S_cnt);
+    Serial.println(S_rgt);
+    Serial.println(S_lft);
+    Serial.println(S_cnt_avg);
+    Serial.println(S_rgt_avg);
+    Serial.println(S_lft_avg);
+    Serial.println(follow_state);
     Serial.println(get_voltage());  
     Serial.println(get_current());  
     Serial.println(motors_state);  
