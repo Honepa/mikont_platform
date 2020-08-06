@@ -1,4 +1,4 @@
-#include "DueTimer.h"
+//#include "DueTimer.h"
 #include "typedef.h"
 
 void motors(int on_off)
@@ -35,7 +35,7 @@ void onCountTimer()
   lft_ticks = 0;
   rgt_ticks = 0;
 }
-
+/*
 void onPWMTimer()
 {
   dw(13, ! dr(13));
@@ -86,7 +86,7 @@ void onRGTEncoder()
     s0 = s;
   }
 }
-
+*/
 void setupPins()
 {
   pm( 2, 1);
@@ -101,7 +101,7 @@ void setupPins()
   pm(52, 0);
   dw( 8,1); dw( 9,1); dw(10,1);
 }
-
+/*
 void setupTimers()
 {
   Timer4.attachInterrupt(onCountTimer);
@@ -121,7 +121,7 @@ void setupInterrupts()
     digitalPinToInterrupt(52), onRGTEncoder, CHANGE
   );
 }
-
+*/
 void setupSerial()
 {
   Serial.begin(9600);
