@@ -13,6 +13,21 @@ void sensor(int on_off)
   dw( 9, sensor_state); 
 }
 
+void platformStop()
+{
+  motors(OFF);
+  sensor(OFF);
+  lft_target = 0;
+  rgt_target = 0;
+}
+
+void platformForward(int lft, int rgt)
+{
+  motors(ON);
+  lft_target = lft;
+  rgt_target = rgt;
+}
+
 float get_voltage()
 {
   return V_a / 70.9;
@@ -33,6 +48,11 @@ void onCountTimer()
   // rgt_avg = rgt_ticks;
   lft_ticks = 0;
   rgt_ticks = 0;
+
+  lft_pwm += round(0.3 * (lft_target - lft_avg));
+  rgt_pwm += round(0.3 * (rgt_target - rgt_avg));
+  lft_pwm = min(255, max(0, lft_pwm));
+  rgt_pwm = min(255, max(0, rgt_pwm));
 }
 
 void onPWMTimer()
@@ -159,43 +179,48 @@ void loop()
     }
     else if (cmd == CMD_FORWARD) 
     {
-      lft_pwm = Serial.parseInt();
-      rgt_pwm = Serial.parseInt();
-      motors(ON);
+      lft_target = Serial.parseInt();
+      rgt_target = Serial.parseInt();
+      platform_state = FORWARD;
     }
     else if (cmd == CMD_BACK) 
     {
-      lft_pwm = 0; Serial.parseInt();
-      rgt_pwm = 0; Serial.parseInt();
+      lft_target = 0; Serial.parseInt();
+      rgt_target = 0; Serial.parseInt();
+      platform_state = BACK;
     }
     else if (cmd == CMD_LEFT) 
     {
-      lft_pwm = Serial.parseInt();
-      rgt_pwm = Serial.parseInt();
+      lft_target = Serial.parseInt();
+      rgt_target = Serial.parseInt();
+      platform_state = ROT_LFT;
     }
     else if (cmd == CMD_RIGHT) 
     {
-      lft_pwm = Serial.parseInt();
-      rgt_pwm = Serial.parseInt();
+      lft_target = Serial.parseInt();
+      rgt_target = Serial.parseInt();
+      platform_state = ROT_RGT;
     }
     else if (cmd == CMD_ON_LINE) 
     {
-      lft_pwm = Serial.parseInt();
-      rgt_pwm = Serial.parseInt();
-      sensor(ON);
+      lft_target = Serial.parseInt();
+      rgt_target = Serial.parseInt();
+      platform_state = FOLLOW_LINE;
     }
     else if (cmd == CMD_STOP) 
     {
-      lft_pwm = 0; Serial.parseInt();
-      rgt_pwm = 0; Serial.parseInt();
-      motors(OFF);
-      sensor(OFF);
+      lft_target = 0; Serial.parseInt();
+      rgt_target = 0; Serial.parseInt();
+      platform_state = STOP;
     }
     Serial.println(cmd);
-    Serial.println(lft_pwm);
-    Serial.println(rgt_pwm);
+    Serial.println(platform_state);
+    Serial.println(lft_target);
+    Serial.println(rgt_target);
     Serial.println(lft_avg);
     Serial.println(rgt_avg);
+    Serial.println(lft_pwm);
+    Serial.println(rgt_pwm);
     Serial.println(ar(A0));
     Serial.println(ar(A1));
     Serial.println(ar(A2));  
@@ -204,5 +229,40 @@ void loop()
     Serial.println(motors_state);  
     Serial.println(sensor_state);  
   } else {
+    switch (platform_state)
+    {
+      case INIT:
+        platform_state = READY;
+        motors(OFF);
+        sensor(OFF);
+        break;
+      case READY:
+
+        break;
+      case FORWARD:
+        platformForward(lft_target, rgt_target);
+        break;
+      case STOP:
+        platformStop();
+        platform_state = READY;
+        break;
+      case ROT_LFT:
+        motors(ON);
+        sensor(OFF);
+        break;
+      case ROT_RGT:
+        motors(ON);
+        sensor(OFF);
+        break;
+      case FOLLOW_LINE:
+        motors(ON);
+        sensor(ON);
+
+        break;
+      case BACK:
+        motors(OFF);
+        sensor(OFF);
+        break;
+    }
   }
 }

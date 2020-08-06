@@ -29,8 +29,8 @@ int cmd = CMD_NONE;
 
 volatile uint8_t pwm_timer_cnt = 0;
 
-volatile uint8_t lft_pwm = 0;
-volatile uint8_t rgt_pwm = 0;
+volatile int lft_pwm = 0;
+volatile int rgt_pwm = 0;
 volatile int lft_ticks = 0;
 volatile int rgt_ticks = 0;
 volatile int lft_speed = 0;

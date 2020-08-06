@@ -28,15 +28,28 @@ class Arduino():
             0: "ON",
             1: "OFF",
         },
+        "platform_state": {
+            0: "INIT",
+            1: "READY",
+            2: "FORWARD",
+            3: "STOP",
+            4: "ROT_LFT",
+            5: "ROT_RGT",
+            6: "FOLLOW_LINE",
+            7: "BACK",
+        }
     }
 
     COMMAND_KEY_ORDER  = ["cmd", "lft_pwm", "rgt_pwm", ]
     RESPONCE_KEY_ORDER = [
         (str, "last_cmd", "cmd"), 
-        (int, "lft_pwm", 0), 
-        (int, "rgt_pwm", 0), 
+        (int, "platform_state", "platform_state"), 
+        (int, "lft_target", 0), 
+        (int, "rgt_target", 0), 
         (int, "lft_avg", 0), 
         (int, "rgt_avg", 0), 
+        (int, "lft_pwm", 0), 
+        (int, "rgt_pwm", 0), 
         (float, "a0", 0), 
         (float, "a1", 0), 
         (float, "a2", 0), 
@@ -133,21 +146,27 @@ class Arduino():
         return rez
 
 if __name__ == '__main__':
+    log = []
     from pprint import pprint
     ino = Arduino()
     for i in range(10):
-        pprint(ino.test())
+        log += [ino.test()]
+        pprint(log[-1])
         sleep(1)
     pprint(ino.forward(20,20))
-    for i in range(10):
-        pprint(ino.test())
+    for i in range(30):
+        log += [ino.test()]
+        pprint(log[-1])
         sleep(1)
     pprint(ino.follow_line(50,50))
-    for i in range(10):
-        pprint(ino.test())
+    for i in range(30):
+        log += [ino.test()]
+        pprint(log[-1])
         sleep(1)
     pprint(ino.stop())
     for i in range(10):
-        pprint(ino.test())
+        log += [ino.test()]
+        pprint(log[-1])
         sleep(1)
-        
+    from json import dump
+    dump(log, open('log.json','w'), indent = 2)
