@@ -15,13 +15,12 @@ void sensor(int on_off)
 
 float get_voltage()
 {
-  return ar(A3) / 70.9;
+  return V_a / 70.9;
 }
 
 float get_current()
 {
-  return ar(A4);
-  return ((float) ar(A4) - 503.0) / -25.0;
+  return -I_a / 25.0 + 20.0;
 }
 
 void onCountTimer()
@@ -43,6 +42,16 @@ void onPWMTimer()
 
   dw(4, pwm_timer_cnt < lft_pwm);
   dw(2, pwm_timer_cnt < rgt_pwm);
+}
+
+void onMeasureTimer()
+{
+  I_m = ar(A4);
+  V_m = ar(A3);
+  I_c += I_m - I_a;
+  V_c += V_m - V_a;
+  I_a = I_c / 10;
+  V_a = V_c / 10;
 }
 
 void onLogTimer()
@@ -108,6 +117,8 @@ void setupTimers()
   Timer4.start(1000000);
 //  Timer2.attachInterrupt(onLogTimer);
 //  Timer2.start(1000000);
+  Timer2.attachInterrupt(onMeasureTimer);
+  Timer2.start(100);
   Timer3.attachInterrupt(onPWMTimer);
   Timer3.start(50); 
 }
