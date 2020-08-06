@@ -70,6 +70,7 @@ class Arduino():
         try:
             self.port.close()
         except AttributeError:
+            import sys
             print('Can not close port %s' % self.port, file = sys.stderr)
 
     def __str__(self):
