@@ -1,8 +1,6 @@
 #export FLASK_APP=drive_fl.py
 #flask run --host 0.0.0.0 --port 8080
 
-import sys
-
 from flask import Flask, render_template, request
 from json import dumps
 from arduino import Arduino
@@ -34,10 +32,10 @@ def drive_mod(**qwargs):
     print(state.get('dir'))
     responce = {}
     if state.get('forward') == "1":
-        cmd = 1
+        arduino_due.forward(lft_pwm, rgt_pwm)
         print("go forward", speed, direct)
     elif state.get('back') == "1":
-        cmd = 2
+        
         print("go back", speed, direct)
     elif state.get('left') == "1":
         cmd = 3
@@ -48,17 +46,15 @@ def drive_mod(**qwargs):
         lft_pwm = 0
         print("go right", speed, direct)
     elif state.get('on_line') == "1":
-        cmd = 5
+        arduino_due.follow_line(lft_pwm, rgt_pwm)
         print("go of line", speed,  direct)
     else:
-        cmd = 0
+        arduino_due.stop()
         lft_pwm = 0
         rgt_pwm = 0
         print("stop!!!", speed, direct)
     try:
-        arduino_due.port.write(bytes("%s %s %s\n" % (cmd, lft_pwm, rgt_pwm), "ascii"))
-        responce = arduino_due.read_responce_dict()
-        print(dumps(responce))
+        pass
     except Exception as e:
         print(e)
     return dumps(responce)

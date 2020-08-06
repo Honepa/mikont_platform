@@ -25,12 +25,7 @@ function fl_drive(){
         }
     });
 };    
-$(window).on('touchend', function(){
-    state.forward = 0;
-    state.back    = 0;
-    state.left    = 0;
-    state.right   = 0;
-});
+
 $(window).on('mouseup', function(){
     state.forward = 0;
     state.back    = 0;
@@ -79,6 +74,7 @@ document.getElementById("right").addEventListener("mousedown", function(){
     state.on_line = 0;
     state.stop    = 0;
 });
+*/
 document.getElementById("on_line").addEventListener("mousedown", function(){
     state.forward = 0;
     state.back    = 0;
@@ -86,6 +82,15 @@ document.getElementById("on_line").addEventListener("mousedown", function(){
     state.right   = 0;
     state.on_line = 1;
     state.stop    = 0;
+});
+$("#on_line").on("touchstart", function(){
+    state.forward = 0;
+    state.back    = 0;
+    state.left    = 0;
+    state.right   = 0;
+    state.on_line = 1;
+    state.stop    = 0;
+
 });
 document.getElementById("stop").addEventListener("mousedown", function(){
     state.forward = 0;
@@ -95,14 +100,14 @@ document.getElementById("stop").addEventListener("mousedown", function(){
     state.on_line = 0;
     state.stop    = 1;
 });
-*/  
-$("#speed").on("touch", function() {
+
+$("#speed").on("click", function() {
     state.speed=this.value;
 });
 
-$("#dir").on("touch", function() {
-    state.dir=this.value;
-});
+function change_dir(new_dir){
+    state.dir = new_dir;
+}
 
 function in_zero() {
     $("#dir").value = 0;
