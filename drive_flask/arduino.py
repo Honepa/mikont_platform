@@ -1,3 +1,4 @@
+import sys
 from time import sleep 
 from serial import Serial, SerialException
 
