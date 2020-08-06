@@ -37,6 +37,15 @@ class Arduino():
             5: "ROT_RGT",
             6: "FOLLOW_LINE",
             7: "BACK",
+        },
+        "follow_state": {
+            0: "START",
+            1: "CALIBRATE",
+            2: "CALIBRATED",
+            3: "CENTER",
+            4: "LEFT",
+            5: "RIGHT",
+            6: "FAIL",
         }
     }
 
@@ -50,9 +59,13 @@ class Arduino():
         (int, "rgt_avg", 0), 
         (int, "lft_pwm", 0), 
         (int, "rgt_pwm", 0), 
-        (float, "s_center", 0), 
-        (float, "s_right", 0), 
-        (float, "s_left", 0), 
+        (int, "s_center", 0), 
+        (int, "s_right", 0), 
+        (int, "s_left", 0), 
+        (int, "S_cnt_avg", 0),
+        (int, "S_rgt_avg", 0),
+        (int, "S_lft_avg", 0),
+        (int, "follow_state", "follow_state"),
         (float, "VCC", 0), 
         (float, "I", 0), 
         (int, "motors_state", "state"),
@@ -149,7 +162,7 @@ if __name__ == '__main__':
     log = []
     from pprint import pprint
     ino = Arduino()
-    pprint(ino.follow_line(0,0))
+    pprint(ino.follow_line(60,60))
     for i in range(20):
         log += [ino.test()]
         pprint(log[-1])

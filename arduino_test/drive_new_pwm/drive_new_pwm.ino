@@ -86,24 +86,14 @@ void platformFollow(int lft, int rgt)
       {
         follow_state = RIGHT;
       }
+      // if (S_cnt > S_cnt_avg & S_lft > S_lft_avg & S_rgt > S_rgt_avg)
+      // {
+      //   follow_state = FAIL;
+      //   platform_state = STOP;
+      // }
       break;
     case LEFT:
       if (S_cnt > S_cnt_avg & S_lft < S_lft_avg & S_rgt > S_rgt_avg)
-      {
-        lft_pwm = lft / 2;
-        rgt_pwm = rgt;
-      } 
-      if (S_cnt < S_cnt_avg & S_lft > S_lft_avg & S_rgt > S_rgt_avg)
-      {
-        follow_state = CENTER;
-      }
-      if (S_cnt > S_cnt_avg & S_lft > S_lft_avg & S_rgt < S_rgt_avg)
-      {
-        follow_state = RIGHT;
-      }
-      break;
-    case RIGHT:
-      if (S_cnt > S_cnt_avg & S_lft > S_lft_avg & S_rgt < S_rgt_avg)
       {
         lft_pwm = lft;
         rgt_pwm = rgt / 2;
@@ -112,10 +102,35 @@ void platformFollow(int lft, int rgt)
       {
         follow_state = CENTER;
       }
+      if (S_cnt > S_cnt_avg & S_lft > S_lft_avg & S_rgt < S_rgt_avg)
+      {
+        follow_state = RIGHT;
+      }
+      // if (S_cnt > S_cnt_avg & S_lft > S_lft_avg & S_rgt > S_rgt_avg)
+      // {
+      //   follow_state = FAIL;
+      //   platform_state = STOP;
+      // }
+      break;
+    case RIGHT:
+      if (S_cnt > S_cnt_avg & S_lft > S_lft_avg & S_rgt < S_rgt_avg)
+      {
+        lft_pwm = lft / 2;
+        rgt_pwm = rgt;
+      } 
+      if (S_cnt < S_cnt_avg & S_lft > S_lft_avg & S_rgt > S_rgt_avg)
+      {
+        follow_state = CENTER;
+      }
       if (S_cnt > S_cnt_avg & S_lft < S_lft_avg & S_rgt > S_rgt_avg)
       {
         follow_state = RIGHT;
       }
+      // if (S_cnt > S_cnt_avg & S_lft > S_lft_avg & S_rgt > S_rgt_avg)
+      // {
+      //   follow_state = FAIL;
+      //   platform_state = STOP;
+      // }
       break;
     case FAIL:
       motors(OFF);
