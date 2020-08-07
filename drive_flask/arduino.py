@@ -42,9 +42,7 @@ class Arduino():
             0: "START",
             1: "CALIBRATE",
             2: "CALIBRATED",
-            3: "CENTER",
-            4: "LEFT",
-            5: "RIGHT",
+            3: "FOLLOW",
             6: "FAIL",
         }
     }
@@ -162,8 +160,8 @@ if __name__ == '__main__':
     log = []
     from pprint import pprint
     ino = Arduino()
-    pprint(ino.follow_line(60,60))
-    for i in range(20):
+    pprint(ino.follow_line(160,160))
+    for i in range(120):
         log += [ino.test()]
         pprint(log[-1])
         sleep(1)

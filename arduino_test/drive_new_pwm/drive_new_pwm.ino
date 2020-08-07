@@ -28,10 +28,27 @@ void platformForward(int lft, int rgt)
   rgt_target = rgt;
 }
 
+ENLineSensorValue find_line()
+{
+  int l = S_lft < S_lft_avg; dw(22, l);
+  int c = S_cnt < S_cnt_avg; dw(24, c);
+  int r = S_rgt < S_rgt_avg; dw(26, r);
+  if ( l & !c & !r) return SV_LL;
+  if ( l &  c & !r) return SV_L;
+  if (!l &  c & !r) return SV_C;
+  if (!l &  c &  r) return SV_R;
+  if (!l & !c &  r) return SV_RR;
+
+  if ( l &  c &  r) return SV_ALL;
+}
+
 void platformFollow(int lft, int rgt)
 {
   static long t_0 = millis();
   static int i_calibrate = 0;
+
+  ENLineSensorValue lsv = find_line();
+
   switch (follow_state)
   {
     case START:
@@ -64,75 +81,39 @@ void platformFollow(int lft, int rgt)
     case CALIBRATED:
       if (millis() - t_0 > 2000) 
       {
-        follow_state = CENTER;
+        follow_state = FOLLOW;
         t_0 = millis();
       } else {
         motors(ON);
-        lft_pwm = 40;
-        rgt_pwm = 40;
+        lft_pwm = 100;
+        rgt_pwm = 100;
       }
       break;
-    case CENTER:
-      if (S_cnt < S_cnt_avg & S_lft > S_lft_avg & S_rgt > S_rgt_avg)
+    case FOLLOW:
+      switch (lsv)
       {
-        lft_pwm = lft;
-        rgt_pwm = rgt;
-      } 
-      if (S_cnt > S_cnt_avg & S_lft < S_lft_avg & S_rgt > S_rgt_avg)
-      {
-        follow_state = LEFT;
+        case SV_RR:
+          lft_pwm = 0;       rgt_pwm = rgt;
+          break;
+        case SV_R:
+          lft_pwm = lft / 2; rgt_pwm = rgt;
+          break;
+        case SV_C:
+          lft_pwm = lft;     rgt_pwm = rgt;
+          break;
+        case SV_L:
+          lft_pwm = lft;     rgt_pwm = rgt / 2;
+          break;
+        case SV_LL:
+          lft_pwm = lft;     rgt_pwm = 0;
+          break;
+        case SV_ALL:
+          follow_state = FAIL;
+          break;
       }
-      if (S_cnt > S_cnt_avg & S_lft > S_lft_avg & S_rgt < S_rgt_avg)
-      {
-        follow_state = RIGHT;
-      }
-      // if (S_cnt > S_cnt_avg & S_lft > S_lft_avg & S_rgt > S_rgt_avg)
-      // {
-      //   follow_state = FAIL;
-      //   platform_state = STOP;
-      // }
-      break;
-    case LEFT:
-      if (S_cnt > S_cnt_avg & S_lft < S_lft_avg & S_rgt > S_rgt_avg)
-      {
-        lft_pwm = lft;
-        rgt_pwm = rgt / 2;
-      } 
-      if (S_cnt < S_cnt_avg & S_lft > S_lft_avg & S_rgt > S_rgt_avg)
-      {
-        follow_state = CENTER;
-      }
-      if (S_cnt > S_cnt_avg & S_lft > S_lft_avg & S_rgt < S_rgt_avg)
-      {
-        follow_state = RIGHT;
-      }
-      // if (S_cnt > S_cnt_avg & S_lft > S_lft_avg & S_rgt > S_rgt_avg)
-      // {
-      //   follow_state = FAIL;
-      //   platform_state = STOP;
-      // }
-      break;
-    case RIGHT:
-      if (S_cnt > S_cnt_avg & S_lft > S_lft_avg & S_rgt < S_rgt_avg)
-      {
-        lft_pwm = lft / 2;
-        rgt_pwm = rgt;
-      } 
-      if (S_cnt < S_cnt_avg & S_lft > S_lft_avg & S_rgt > S_rgt_avg)
-      {
-        follow_state = CENTER;
-      }
-      if (S_cnt > S_cnt_avg & S_lft < S_lft_avg & S_rgt > S_rgt_avg)
-      {
-        follow_state = RIGHT;
-      }
-      // if (S_cnt > S_cnt_avg & S_lft > S_lft_avg & S_rgt > S_rgt_avg)
-      // {
-      //   follow_state = FAIL;
-      //   platform_state = STOP;
-      // }
       break;
     case FAIL:
+      lft_pwm = 0; rgt_pwm = 0;
       motors(OFF);
       sensor(OFF);
       break;
@@ -244,6 +225,14 @@ void setupPins()
   pm(13, 1);
   pm(50, 0);
   pm(52, 0);
+
+  pm(22, 1);
+  pm(23, 1); dw(22, 1); dw(23, 0);
+  pm(24, 1);
+  pm(25, 1); dw(24, 1); dw(25, 0);
+  pm(26, 1);
+  pm(27, 1); dw(26, 1); dw(27, 0);
+
   dw( 8,1); dw( 9,1); dw(10,1);
 }
 

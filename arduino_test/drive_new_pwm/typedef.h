@@ -26,7 +26,12 @@ enum ENPlatformState
 
 enum ENFollowState
 {
-    START, CALIBRATE, CALIBRATED, CENTER, LEFT, RIGHT, FAIL
+    START, CALIBRATE, CALIBRATED, FOLLOW, FAIL
+};
+
+enum ENLineSensorValue
+{
+  SV_LL, SV_L, SV_C, SV_R, SV_RR, SV_ALL
 };
 
 ENPlatformState platform_state = INIT;
