@@ -49,63 +49,32 @@ $("#forward").on("mousedown", function(){
     state.on_line = 0;
     state.stop    = 0;
 
-});
-$("#back").on("touchstart", function(){
+});/*
+document.getElementById("back").addEventListener("mousedown", function(){
     state.forward = 0;
     state.back    = 1;
     state.left    = 0;
     state.right   = 0;
     state.on_line = 0;
     state.stop    = 0;
-
 });
-$("#back").on("mousedown", function(){
-    state.forward = 0;
-    state.back    = 1;
-    state.left    = 0;
-    state.right   = 0;
-    state.on_line = 0;
-    state.stop    = 0;
-
-});
-$("#left").on("touchstart", function(){
+document.getElementById("left").addEventListener("mousedown", function(){
     state.forward = 0;
     state.back    = 0;
     state.left    = 1;
     state.right   = 0;
     state.on_line = 0;
     state.stop    = 0;
-
 });
-$("#left").on("mousedown", function(){
-    state.forward = 0;
-    state.back    = 0;
-    state.left    = 1;
-    state.right   = 0;
-    state.on_line = 0;
-    state.stop    = 0;
-
-});
-
-$("#right").on("touchstart", function(){
+document.getElementById("right").addEventListener("mousedown", function(){
     state.forward = 0;
     state.back    = 0;
     state.left    = 0;
     state.right   = 1;
     state.on_line = 0;
     state.stop    = 0;
-
 });
-$("#right").on("mousedown", function(){
-    state.forward = 0;
-    state.back    = 0;
-    state.left    = 0;
-    state.right   = 1;
-    state.on_line = 0;
-    state.stop    = 0;
-
-});
-
+*/
 document.getElementById("on_line").addEventListener("mousedown", function(){
     state.forward = 0;
     state.back    = 0;
@@ -131,15 +100,7 @@ document.getElementById("stop").addEventListener("mousedown", function(){
     state.on_line = 0;
     state.stop    = 1;
 });
-$("#stop").on("touchstart", function(){
-    state.forward = 0;
-    state.back    = 0;
-    state.left    = 0;
-    state.right   = 0;
-    state.on_line = 0;
-    state.stop    = 1;
 
-});
 
 function change_speed(new_speed) {
     state.speed = new_speed;
