@@ -32,8 +32,8 @@ void platformForward(int lft, int rgt)
   dw(44, 0);
   dw(47, 1);
   dw(45, 1);
-  aw(2, rgt);
-  aw(4, lft);
+  aw(2, rgt);rgt_pwm = rgt;
+  aw(4, lft);lft_pwm = lft;
 }
 
 ENLineSensorValue find_line()
@@ -41,21 +41,19 @@ ENLineSensorValue find_line()
   int l = S_lft <= S_lft_wht; dw(22, l);
   int c = S_cnt <= S_cnt_wht; dw(24, c);
   int r = S_rgt <= S_rgt_wht; dw(26, r);
-  if ( l & !c & !r) return SV_LL;
-  if ( l &  c & !r) return SV_L;
-  if (!l &  c & !r) return SV_C;
-  if (!l &  c &  r) return SV_R;
-  if (!l & !c &  r) return SV_RR;
+  if ( l && !c && !r) lsv = SV_LL;
+  if ( l &&  c && !r) lsv = SV_L;
+  if (!l &&  c && !r) lsv = SV_C;
+  if (!l &&  c &&  r) lsv = SV_R;
+  if (!l && !c &&  r) lsv = SV_RR;
 
-  if ( l &  c &  r) return SV_ALL;
+  if ( l &&  c &&  r) lsv = SV_ALL;
 }
 
 void platformFollow(int lft, int rgt)
 {
   static long t_0 = millis();
   static int i_calibrate = 0;
-
-  ENLineSensorValue lsv = find_line();
 
   switch (follow_state)
   {
@@ -69,16 +67,16 @@ void platformFollow(int lft, int rgt)
       }
       break;
     case CALIBRATE:
-      if (millis() - t_0 > 1000) 
+      if (millis() - t_0 > 5000) 
       {
         follow_state = CALIBRATED;
         t_0 = millis();
         S_cnt_wht /= i_calibrate;
-        S_cnt_wht += 20;
+        S_cnt_wht += 60;
         S_rgt_wht /= i_calibrate;
-        S_rgt_wht += 20;
+        S_rgt_wht += 60;
         S_lft_wht /= i_calibrate;
-        S_lft_wht += 20;
+        S_lft_wht += 60;
       } else {
         i_calibrate++;
         S_cnt_wht += S_cnt;
@@ -148,10 +146,10 @@ void onCountTimer()
 
   // lft_pwm += round(0.3 * (lft_target - lft_avg));
   // rgt_pwm += round(0.3 * (rgt_target - rgt_avg));
-  lft_pwm = lft_target;
-  rgt_pwm = rgt_target;
-  lft_pwm = min(255, max(0, lft_pwm));
-  rgt_pwm = min(255, max(0, rgt_pwm));
+  // lft_pwm = lft_target;
+  // rgt_pwm = rgt_target;
+  // lft_pwm = min(255, max(0, lft_pwm));
+  // rgt_pwm = min(255, max(0, rgt_pwm));
 }
 
 void onPWMTimer()
@@ -171,16 +169,18 @@ void onMeasureTimer()
   S_cnt_c += S_cnt_m - S_cnt;
   S_rgt_c += S_rgt_m - S_rgt;
   S_lft_c += S_lft_m - S_lft;
-  S_cnt = S_cnt_c / 10;
-  S_rgt = S_rgt_c / 10;
-  S_lft = S_lft_c / 10;
+  S_cnt = S_cnt_c / 100;
+  S_rgt = S_rgt_c / 100;
+  S_lft = S_lft_c / 100;
 
   I_m = ar(A4);
   V_m = ar(A3);
   I_c += I_m - I_a;
   V_c += V_m - V_a;
-  I_a = I_c / 10;
-  V_a = V_c / 10;
+  I_a = I_c / 100;
+  V_a = V_c / 100;
+
+  lsv = find_line();
 }
 
 void onLogTimer()

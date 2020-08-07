@@ -160,7 +160,7 @@ if __name__ == '__main__':
     log = []
     from pprint import pprint
     ino = Arduino()
-    pprint(ino.follow_line(6,6))
+    pprint(ino.follow_line(0,0))
     for i in range(30):
         log += [ino.test()]
         pprint(log[-1])

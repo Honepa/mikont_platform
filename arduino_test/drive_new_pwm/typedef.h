@@ -66,6 +66,8 @@ volatile int S_cnt = 0;
 volatile int S_rgt = 0;
 volatile int S_lft = 0;
 
+volatile ENLineSensorValue lsv = SV_ALL;
+
 long S_cnt_wht = 0;
 long S_rgt_wht = 0;
 long S_lft_wht = 0;
