@@ -16,16 +16,24 @@ void sensor(int on_off)
 void platformStop()
 {
   motors(OFF);
-  sensor(OFF);
-  lft_target = 0;
-  rgt_target = 0;
+  //sensor(OFF);
+  dw(46, 0);
+  dw(44, 0);
+  dw(47, 0);
+  dw(45, 0);
+  aw(2, 0);
+  aw(4, 0);
 }
 
 void platformForward(int lft, int rgt)
 {
   motors(ON);
-  lft_target = lft;
-  rgt_target = rgt;
+  dw(46, 0);
+  dw(44, 0);
+  dw(47, 1);
+  dw(45, 1);
+  aw(2, rgt);
+  aw(4, lft);
 }
 
 ENLineSensorValue find_line()
@@ -84,28 +92,27 @@ void platformFollow(int lft, int rgt)
         follow_state = FOLLOW;
         t_0 = millis();
       } else {
-        motors(ON);
-        lft_pwm = 100;
-        rgt_pwm = 100;
+        platformForward(100,100);
       }
       break;
     case FOLLOW:
+      platformForward(lft,rgt);
       switch (lsv)
       {
         case SV_RR:
-          lft_pwm = 0;       rgt_pwm = rgt;
+          platformForward(      0,     rgt);
           break;
         case SV_R:
-          lft_pwm = lft / 2; rgt_pwm = rgt;
+          platformForward(lft / 2,     rgt);
           break;
         case SV_C:
-          lft_pwm = lft;     rgt_pwm = rgt;
+          platformForward(    lft,     rgt);
           break;
         case SV_L:
-          lft_pwm = lft;     rgt_pwm = rgt / 2;
+          platformForward(    lft, rgt / 2);
           break;
         case SV_LL:
-          lft_pwm = lft;     rgt_pwm = 0;
+          platformForward(    lft,       0);
           break;
         case SV_ALL:
           follow_state = FAIL;
@@ -113,9 +120,7 @@ void platformFollow(int lft, int rgt)
       }
       break;
     case FAIL:
-      lft_pwm = 0; rgt_pwm = 0;
-      motors(OFF);
-      sensor(OFF);
+      platformStop();
       break;
   }
 }
@@ -160,9 +165,16 @@ void onPWMTimer()
 
 void onMeasureTimer()
 {
-  S_cnt = ar(A0);
-  S_rgt = ar(A1);
-  S_lft = ar(A2);
+  S_cnt_m = ar(A0);
+  S_rgt_m = ar(A1);
+  S_lft_m = ar(A2);
+  S_cnt_c += S_cnt_m - S_cnt;
+  S_rgt_c += S_rgt_m - S_rgt;
+  S_lft_c += S_lft_m - S_lft;
+  S_cnt = S_cnt_c / 10;
+  S_rgt = S_rgt_c / 10;
+  S_lft = S_lft_c / 10;
+
   I_m = ar(A4);
   V_m = ar(A3);
   I_c += I_m - I_a;
@@ -216,13 +228,19 @@ void onRGTEncoder()
 void setupPins()
 {
   pm( 2, 1);
-  pm( 3, 1);
   pm( 4, 1);
-  pm( 5, 1);
+//  pm( 4, 1);
+//  pm( 5, 1);
   pm( 8, 1);
   pm( 9, 1);
   pm(10, 1);
   pm(13, 1);
+
+  pm(46, 1);
+  pm(47, 1);
+  pm(44, 1);
+  pm(45, 1);
+
   pm(50, 0);
   pm(52, 0);
 
@@ -244,8 +262,8 @@ void setupTimers()
 //  Timer2.start(1000000);
   Timer2.attachInterrupt(onMeasureTimer);
   Timer2.start(100);
-  Timer3.attachInterrupt(onPWMTimer);
-  Timer3.start(50); 
+  // Timer3.attachInterrupt(onPWMTimer);
+  // Timer3.start(50); 
 }
 
 void setupInterrupts()

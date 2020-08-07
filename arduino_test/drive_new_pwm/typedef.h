@@ -54,6 +54,14 @@ volatile int I_a = 0;
 volatile int V_a = 0;
 volatile int I_c = 0;
 volatile int V_c = 0;
+volatile int S_cnt_m = 0;
+volatile int S_rgt_m = 0;
+volatile int S_lft_m = 0;
+
+volatile int S_cnt_c = 0;
+volatile int S_rgt_c = 0;
+volatile int S_lft_c = 0;
+
 volatile int S_cnt = 0;
 volatile int S_rgt = 0;
 volatile int S_lft = 0;
