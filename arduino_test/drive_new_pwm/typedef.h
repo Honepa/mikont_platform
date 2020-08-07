@@ -66,9 +66,9 @@ volatile int S_cnt = 0;
 volatile int S_rgt = 0;
 volatile int S_lft = 0;
 
-long S_cnt_avg = 0;
-long S_rgt_avg = 0;
-long S_lft_avg = 0;
+long S_cnt_wht = 0;
+long S_rgt_wht = 0;
+long S_lft_wht = 0;
 
 int lft_target = 0;
 int rgt_target = 0;

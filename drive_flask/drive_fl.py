@@ -4,16 +4,16 @@
 from flask import Flask, render_template, request
 from json import dumps
 from arduino import Arduino
-#arduino_due = Arduino()
+arduino_due = Arduino()
 
 def change_dir(speed, direct):
     x = int(direct * (speed / 255))
     if x > 0:
-        lft_pwm = speed - x
-        rgt_pwm = speed
-    else:
+        rgt_pwm = speed - x
         lft_pwm = speed
-        rgt_pwm = speed - abs(x)
+    else:
+        rgt_pwm = speed
+        lft_pwm = speed - abs(x)
     return lft_pwm, rgt_pwm
 
 app = Flask(__name__)
@@ -28,28 +28,25 @@ def drive_mod(**qwargs):
     speed = int(state.get('speed'))
     direct = int(state.get('dir'))
     lft_pwm, rgt_pwm = change_dir(speed, direct)
-    print(state.get('speed'))
-    print(state.get('dir'))
+    #print(state.get('speed'))
+    #print(state.get('dir'))
     responce = {}
     if state.get('forward') == "1":
-        arduino_due.forward(lft_pwm, rgt_pwm)
+        responce = arduino_due.forward(lft_pwm, rgt_pwm)
         print("go forward", speed, direct)
     elif state.get('back') == "1":
-        
         print("go back", speed, direct)
     elif state.get('left') == "1":
-        cmd = 3
-        rgt_pwm = 0
+        responce = arduino_due.forward(0, rgt_pwm)        
         print("go left", speed, direct)
     elif state.get('right') == "1":
-        cmd = 4
-        lft_pwm = 0
+        responce = arduino_due.forward(lft_pwm, 0)
         print("go right", speed, direct)
     elif state.get('on_line') == "1":
-        arduino_due.follow_line(lft_pwm, rgt_pwm)
+        responce = arduino_due.follow_line(lft_pwm, rgt_pwm)
         print("go of line", speed,  direct)
     else:
-        arduino_due.stop()
+        responce = arduino_due.stop()
         lft_pwm = 0
         rgt_pwm = 0
         print("stop!!!", speed, direct)
@@ -57,7 +54,7 @@ def drive_mod(**qwargs):
         pass
     except Exception as e:
         print(e)
-    return dumps(responce)
+    return dumps(responce, indent=2)
 
 @app.errorhandler(404)
 def not_found(error):

@@ -38,9 +38,9 @@ void platformForward(int lft, int rgt)
 
 ENLineSensorValue find_line()
 {
-  int l = S_lft < S_lft_avg; dw(22, l);
-  int c = S_cnt < S_cnt_avg; dw(24, c);
-  int r = S_rgt < S_rgt_avg; dw(26, r);
+  int l = S_lft <= S_lft_wht; dw(22, l);
+  int c = S_cnt <= S_cnt_wht; dw(24, c);
+  int r = S_rgt <= S_rgt_wht; dw(26, r);
   if ( l & !c & !r) return SV_LL;
   if ( l &  c & !r) return SV_L;
   if (!l &  c & !r) return SV_C;
@@ -73,17 +73,17 @@ void platformFollow(int lft, int rgt)
       {
         follow_state = CALIBRATED;
         t_0 = millis();
-        S_cnt_avg /= i_calibrate;
-        S_cnt_avg += 50;
-        S_rgt_avg /= i_calibrate;
-        S_rgt_avg += 50;
-        S_lft_avg /= i_calibrate;
-        S_lft_avg += 50;
+        S_cnt_wht /= i_calibrate;
+        S_cnt_wht += 20;
+        S_rgt_wht /= i_calibrate;
+        S_rgt_wht += 20;
+        S_lft_wht /= i_calibrate;
+        S_lft_wht += 20;
       } else {
         i_calibrate++;
-        S_cnt_avg += S_cnt;
-        S_rgt_avg += S_rgt;
-        S_lft_avg += S_lft;
+        S_cnt_wht += S_cnt;
+        S_rgt_wht += S_rgt;
+        S_lft_wht += S_lft;
       }
       break;
     case CALIBRATED:
@@ -115,7 +115,7 @@ void platformFollow(int lft, int rgt)
           platformForward(    lft,       0);
           break;
         case SV_ALL:
-          follow_state = FAIL;
+          //follow_state = FAIL;
           break;
       }
       break;
@@ -347,9 +347,9 @@ void loop()
     Serial.println(S_cnt);
     Serial.println(S_rgt);
     Serial.println(S_lft);
-    Serial.println(S_cnt_avg);
-    Serial.println(S_rgt_avg);
-    Serial.println(S_lft_avg);
+    Serial.println(S_cnt_wht);
+    Serial.println(S_rgt_wht);
+    Serial.println(S_lft_wht);
     Serial.println(follow_state);
     Serial.println(get_voltage());  
     Serial.println(get_current());  
