@@ -8,7 +8,7 @@ body {
 }
 header{
     padding: 20px 0;
-    background-image: src="{{ url_for('static', filename='fon.jpg') }}";
+    background-image: url("{{url_for('static', filename='background13.jpg')}}"); 
     background-repeat: repeat-x;
 }
 
