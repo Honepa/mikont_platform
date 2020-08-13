@@ -36,11 +36,16 @@ void platformForward(int lft, int rgt)
   aw(4, lft);lft_pwm = lft;
 }
 
-ENLineSensorValue find_line()
+void find_line()
 {
+  S_cnt_m = ar(A0);           S_rgt_m = ar(A1);           S_lft_m = ar(A2);
+  S_cnt_c += S_cnt_m - S_cnt; S_rgt_c += S_rgt_m - S_rgt; S_lft_c += S_lft_m - S_lft;
+  S_cnt = S_cnt_c / 100;      S_rgt = S_rgt_c / 100;      S_lft = S_lft_c / 100;
+
   int l = S_lft <= S_lft_wht; dw(22, l);
   int c = S_cnt <= S_cnt_wht; dw(24, c);
   int r = S_rgt <= S_rgt_wht; dw(26, r);
+
   if ( l && !c && !r) lsv = SV_LL;
   if ( l &&  c && !r) lsv = SV_L;
   if (!l &&  c && !r) lsv = SV_C;
@@ -152,54 +157,127 @@ void onCountTimer()
   // rgt_pwm = min(255, max(0, rgt_pwm));
 }
 
-void onPWMTimer()
-{
-  dw(13, ! dr(13));
-  pwm_timer_cnt++;
+// void onPWMTimer()
+// {
+//   dw(13, ! dr(13));
+//   pwm_timer_cnt++;
 
-  dw(4, pwm_timer_cnt < lft_pwm);
-  dw(2, pwm_timer_cnt < rgt_pwm);
+//   dw(4, pwm_timer_cnt < lft_pwm);
+//   dw(2, pwm_timer_cnt < rgt_pwm);
+// }
+
+void do_trig(int pin)
+{
+  dw(pin, 0);
+  dl_us(2);
+  dw(pin, 1);
+  dl_us(10);
+  dw(pin, 0);
 }
 
-void onMeasureTimer()
+void measure_distance()
 {
-  S_cnt_m = ar(A0);
-  S_rgt_m = ar(A1);
-  S_lft_m = ar(A2);
-  S_cnt_c += S_cnt_m - S_cnt;
-  S_rgt_c += S_rgt_m - S_rgt;
-  S_lft_c += S_lft_m - S_lft;
-  S_cnt = S_cnt_c / 100;
-  S_rgt = S_rgt_c / 100;
-  S_lft = S_lft_c / 100;
+  unsigned long t_0, dt;
 
+  switch (distance_sensor_state)
+  {
+    case ST_FRW_TRG:
+    {
+      do_trig(FRW_TRG);
+      distance_sensor_state = ST_FRW_ECH_FF;
+      break;
+    }
+    case ST_FRW_ECH_FF:
+    {
+      if (dr(FRW_ECH)) 
+      {
+        distance_sensor_state = ST_FRW_ECH_BF;
+        t_0 = micros();
+      }
+      break;
+    }
+    case ST_FRW_ECH_BF:
+    {
+      dt = micros() - t_0;
+      if (!dr(FRW_ECH)) 
+      {
+        distance_sensor_state = ST_BCK_TRG;
+        if (dt < 10000) frw_dst_m = (dt) / 58;
+      }
+      break;
+    }
+    case ST_BCK_TRG:
+    {
+      do_trig(BCK_TRG);
+      distance_sensor_state = ST_BCK_ECH_FF;
+      break;
+    }
+    case ST_BCK_ECH_FF:
+    {
+      if (dr(BCK_ECH)) 
+      {
+        distance_sensor_state = ST_BCK_ECH_BF;
+        t_0 = micros();
+      }
+      break;
+    }
+    case ST_BCK_ECH_BF    :
+    {
+      dt = micros() - t_0;
+      if (!dr(BCK_ECH)) 
+      {
+        distance_sensor_state = ST_FRW_TRG;
+        if (dt < 10000) bck_dst_m = (dt) / 58;
+        bck_dst_c += bck_dst_m - bck_dst_a;
+        bck_dst_a = bck_dst_c / 10.0;
+      }
+      break;
+    }
+  }
+
+
+  dw(BCK_TRG, 0);
+  dl_us(2);
+  dw(BCK_TRG, 1);
+  dl_us(10);
+  dw(BCK_TRG, 0);
+  bck_dst_m = pulseIn(BCK_ECH, 1, 50000) / 58;
+  bck_dst_c += bck_dst_m - bck_dst_a;
+  
+  bck_dst_a = bck_dst_c / 10.0;
+}
+
+void measure_power_state()
+{
   I_m = ar(A4);
   V_m = ar(A3);
   I_c += I_m - I_a;
   V_c += V_m - V_a;
   I_a = I_c / 100;
   V_a = V_c / 100;
+}
 
-  lsv = find_line();
+void onMeasureTimer()
+{
+  measure_distance();
+
+  measure_power_state();
+
+  find_line();
 }
 
 void onLogTimer()
 {
-  Serial.print(platform_state);
-  Serial.print("\t");
-  Serial.print(lft_avg);
-  Serial.print("\t");
-  Serial.print(rgt_avg);
-  Serial.print("\t");
-  Serial.print(lft_pwm);
-  Serial.print("\t");
-  Serial.print(rgt_pwm);
-  Serial.print("\t");
-  Serial.print(ar(A0));
-  Serial.print("\t");
-  Serial.print(ar(A1));
-  Serial.print("\t");
-  Serial.print(ar(A2));
+  Serial.print(platform_state);   Serial.print("\t");
+  Serial.print(lft_avg);          Serial.print("\t");
+  Serial.print(rgt_avg);          Serial.print("\t");
+  Serial.print(lft_pwm);          Serial.print("\t");
+  Serial.print(rgt_pwm);          Serial.print("\t");
+  Serial.print(ar(A0));           Serial.print("\t");
+  Serial.print(ar(A1));           Serial.print("\t");
+  Serial.print(ar(A2));           Serial.print("\t");
+  Serial.print(frw_dst_a);        Serial.print("\t");
+  Serial.print(bck_dst_a);        Serial.print("\t");
   Serial.print("\n");
 }
 
